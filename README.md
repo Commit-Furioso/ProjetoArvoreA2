@@ -30,4 +30,4 @@ Projeto desenvolvido para a avaliação (Projeto A2), aplicando conceitos de **�
 1. Certifique-se de ter o **Java 17+** e o **Maven** instalados.
 2. Clone este repositório:
    ```bash
-   git clone [https://github.com/SEU-USUARIO/SEU-REPOSITORIO.git](https://github.com/SEU-USUARIO/SEU-REPOSITORIO.git)
+   git clone [https://github.com/Commit-Furioso/ProjetoArvoreA2](https://github.com/Commit-Furioso/ProjetoArvoreA2)
