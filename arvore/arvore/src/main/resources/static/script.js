@@ -67,7 +67,7 @@ function calcularProducao() {
     document.getElementById('resultado-total').innerText = 
         `Valor Total: R$ ${custoFinal.toFixed(2).replace('.', ',')}`;
 }
-// Carrega os itens na caixa de seleção para podermos editar os preços
+// Carrega os itens na caixa de seleção estilizada
 async function carregarItensParaEdicao() {
     const resposta = await fetch('/api/formulas/itens');
     const itens = await resposta.json();
@@ -75,15 +75,10 @@ async function carregarItensParaEdicao() {
     const select = document.getElementById('select-item');
     select.innerHTML = '<option value="">Selecione um componente...</option>';
     
-    // Cria uma lista apenas com os nomes de quem é "Pai" de alguém
     const nomesDosPais = new Set(itens.map(item => item.nomePai));
     
     itens.forEach(item => {
-        // Um item SÓ pode ter o preço editado se:
-        // 1. Não for o produto final (raiz) -> item.nomePai !== null
-        // 2. Não for pai de nenhum outro item (submontagem) -> !nomesDosPais.has(item.nome)
         if (item.nomePai !== null && !nomesDosPais.has(item.nome)) {
-            // Formata o preço para mostrar sempre com 2 casas decimais no select
             let precoFormatado = item.precoUnitario.toFixed(2).replace('.', ',');
             select.innerHTML += `<option value="${item.id}">${item.nome} (Atual: R$ ${precoFormatado})</option>`;
         }
@@ -101,18 +96,14 @@ async function atualizarPrecoComponente() {
     }
 
     try {
-        // Chama o Java enviando o novo preço
         await fetch(`/api/formulas/atualizar/${id}?preco=${novoPreco}`, {
             method: 'POST'
         });
 
-        // Mostra a notificação de sucesso!
         mostrarNotificacao("✅ Preço atualizado! Recalculando implosão...");
         
-        // Limpa o campo e recarrega tudo para mostrar a implosão visual
         document.getElementById('novo-preco').value = '';
         await carregarFormula(); 
-
     } catch (erro) {
         mostrarNotificacao("❌ Erro ao atualizar o preço no servidor.", 'erro');
         console.error(erro);

@@ -30,17 +30,24 @@
             
             <h2 id="resultado-total">Valor Total: R$ 0,00</h2>
         </div>
-        <div class="calculadora" style="background-color: #e8f0fe; border-color: #d2e3fc;">
-            <h3 style="color: #1a73e8;">✏️ Atualizar Preço (CRUD)</h3>
-            <label for="select-item">Componente:</label>
-            <select id="select-item" style="padding: 10px; border-radius: 5px; margin-right: 10px;">
-                <option value="">Carregando...</option>
-            </select>
+<div class="calculadora" style="background-color: #e8f0fe; border-color: #d2e3fc;">
+            <h3 style="color: #1a73e8; margin-top: 0;">✏️ Atualizar Preço (CRUD)</h3>
             
-            <label for="novo-preco">Novo Preço (R$):</label>
-            <input type="number" id="novo-preco" step="0.01" min="0" placeholder="Ex: 1.50">
+            <div class="form-linha">
+                <div class="input-grupo">
+                    <label for="select-item">Componente:</label>
+                    <select id="select-item" class="select-estilizado">
+                        <option value="">Carregando...</option>
+                    </select>
+                </div>
+                
+                <div class="input-grupo">
+                    <label for="novo-preco">Novo Preço (R$):</label>
+                    <input type="number" id="novo-preco" class="input-estilizado" step="0.01" min="0" placeholder="Ex: 1.50">
+                </div>
+            </div>
             
-            <button onclick="atualizarPrecoComponente()">Salvar Novo Preço</button>
+            <button onclick="atualizarPrecoComponente()" style="margin-top: 15px;">Salvar Novo Preço</button>
         </div>
     </div>
 
