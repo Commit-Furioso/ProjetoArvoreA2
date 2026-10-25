@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Fórmulas - Explosão</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>📦 Gestão de Produção (Árvore Genérica)</h1>
+        
+        <div class="acoes">
+            <button onclick="carregarFormula()">Carregar Explosão da Caneta</button>
+        </div>
+
+        <!-- Aqui a árvore vai ser desenhada pelo JavaScript -->
+        <div class="area-arvore">
+            <h3>Estrutura do Produto:</h3>
+            <div id="arvore-visual" class="tree-container">
+                <em>Clique no botão acima para carregar a fórmula...</em>
+            </div>
+        </div>
+
+        <div class="calculadora">
+            <h3>Simulação de Lote</h3>
+            <label for="qtd-produzir">Quantidade de produtos a fabricar:</label>
+            <input type="number" id="qtd-produzir" value="1" min="1" onchange="calcularProducao()">
+            <button class="btn-secundario" onclick="calcularProducao()">Recalcular</button>
+            
+            <h2 id="resultado-total">Valor Total: R$ 0,00</h2>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

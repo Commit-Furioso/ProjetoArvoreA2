@@ -1,0 +1,40 @@
+body { 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    background-color: #f0f2f5; 
+    color: #333;
+    padding: 20px; 
+}
+.container { 
+    max-width: 800px; 
+    margin: 0 auto; 
+    background: white; 
+    padding: 30px; 
+    border-radius: 10px; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+}
+h1 { color: #1a73e8; border-bottom: 2px solid #e8eaed; padding-bottom: 10px;}
+.acoes { margin: 20px 0; }
+button { 
+    background-color: #1a73e8; color: white; border: none; 
+    padding: 12px 20px; border-radius: 6px; cursor: pointer; 
+    font-size: 16px; font-weight: bold; transition: 0.2s;
+}
+button:hover { background-color: #1557b0; }
+.btn-secundario { background-color: #34a853; }
+.btn-secundario:hover { background-color: #2b803f; }
+.area-arvore { margin-top: 20px; }
+.tree-container { 
+    background: #282c34; color: #abb2bf; padding: 20px; 
+    border-radius: 8px; font-family: monospace; 
+    line-height: 1.6; overflow-x: auto; font-size: 15px;
+}
+.calculadora { 
+    margin-top: 30px; padding-top: 20px; 
+    border-top: 1px solid #e8eaed; background-color: #f8f9fa;
+    padding: 20px; border-radius: 8px;
+}
+input { 
+    padding: 10px; width: 120px; margin-right: 10px; 
+    border: 1px solid #ccc; border-radius: 5px; font-size: 16px;
+}
+#resultado-total { color: #d93025; font-size: 28px; margin-top: 15px;}
