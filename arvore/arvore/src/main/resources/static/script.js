@@ -96,20 +96,27 @@ async function atualizarPrecoComponente() {
     const novoPreco = document.getElementById('novo-preco').value;
 
     if (!id || !novoPreco) {
-        alert("Por favor, selecione um componente e informe o novo preço!");
+        mostrarNotificacao("❌ Por favor, selecione um componente e informe o novo preço!", 'erro');
         return;
     }
 
-    // Chama o Java enviando o novo preço
-    await fetch(`/api/formulas/atualizar/${id}?preco=${novoPreco}`, {
-        method: 'POST'
-    });
+    try {
+        // Chama o Java enviando o novo preço
+        await fetch(`/api/formulas/atualizar/${id}?preco=${novoPreco}`, {
+            method: 'POST'
+        });
 
-    alert("Preço atualizado com sucesso no Banco de Dados! Observe a Implosão recalculando os custos.");
-    
-    // Recarrega tudo para mostrar a implosão visual
-    document.getElementById('novo-preco').value = '';
-    await carregarFormula(); 
+        // Mostra a notificação de sucesso!
+        mostrarNotificacao("✅ Preço atualizado! Recalculando implosão...");
+        
+        // Limpa o campo e recarrega tudo para mostrar a implosão visual
+        document.getElementById('novo-preco').value = '';
+        await carregarFormula(); 
+
+    } catch (erro) {
+        mostrarNotificacao("❌ Erro ao atualizar o preço no servidor.", 'erro');
+        console.error(erro);
+    }
 }
 
 // Quando carregar a árvore, atualiza também a caixa de seleção
@@ -118,3 +125,24 @@ carregarFormula = async function() {
     await funcaoOriginal();
     await carregarItensParaEdicao();
 };
+
+// Função para exibir a notificação elegante
+function mostrarNotificacao(mensagem, tipo = 'sucesso') {
+    const toast = document.getElementById('toast-notificacao');
+    toast.innerText = mensagem;
+    
+    // Muda a cor consoante o tipo de mensagem
+    if (tipo === 'erro') {
+        toast.classList.add('erro');
+    } else {
+        toast.classList.remove('erro');
+    }
+
+    // Mostra a notificação
+    toast.classList.add('mostrar');
+
+    // Esconde automaticamente após 3 segundos
+    setTimeout(() => {
+        toast.classList.remove('mostrar');
+    }, 3000);
+}

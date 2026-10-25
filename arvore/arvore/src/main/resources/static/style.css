@@ -38,3 +38,33 @@ input {
     border: 1px solid #ccc; border-radius: 5px; font-size: 16px;
 }
 #resultado-total { color: #d93025; font-size: 28px; margin-top: 15px;}
+
+/* Estilos para a Notificação (Toast) */
+.toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background-color: #34a853; /* Verde para sucesso */
+    color: white;
+    padding: 16px 24px;
+    border-radius: 8px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    font-size: 16px;
+    font-weight: 600;
+    opacity: 0; /* Invisível por padrão */
+    transform: translateY(30px); /* Ligeiramente para baixo */
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+/* Classe adicionada via JS para fazer a notificação aparecer */
+.toast.mostrar {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Variação de cor para mensagens de erro */
+.toast.erro {
+    background-color: #ea4335; 
+}
