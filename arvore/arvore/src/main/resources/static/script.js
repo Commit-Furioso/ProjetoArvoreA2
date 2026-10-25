@@ -67,3 +67,54 @@ function calcularProducao() {
     document.getElementById('resultado-total').innerText = 
         `Valor Total: R$ ${custoFinal.toFixed(2).replace('.', ',')}`;
 }
+// Carrega os itens na caixa de seleção para podermos editar os preços
+async function carregarItensParaEdicao() {
+    const resposta = await fetch('/api/formulas/itens');
+    const itens = await resposta.json();
+    
+    const select = document.getElementById('select-item');
+    select.innerHTML = '<option value="">Selecione um componente...</option>';
+    
+    // Cria uma lista apenas com os nomes de quem é "Pai" de alguém
+    const nomesDosPais = new Set(itens.map(item => item.nomePai));
+    
+    itens.forEach(item => {
+        // Um item SÓ pode ter o preço editado se:
+        // 1. Não for o produto final (raiz) -> item.nomePai !== null
+        // 2. Não for pai de nenhum outro item (submontagem) -> !nomesDosPais.has(item.nome)
+        if (item.nomePai !== null && !nomesDosPais.has(item.nome)) {
+            // Formata o preço para mostrar sempre com 2 casas decimais no select
+            let precoFormatado = item.precoUnitario.toFixed(2).replace('.', ',');
+            select.innerHTML += `<option value="${item.id}">${item.nome} (Atual: R$ ${precoFormatado})</option>`;
+        }
+    });
+}
+
+// Atualiza o preço no Banco de Dados via API e recalcula a árvore (Implosão)
+async function atualizarPrecoComponente() {
+    const id = document.getElementById('select-item').value;
+    const novoPreco = document.getElementById('novo-preco').value;
+
+    if (!id || !novoPreco) {
+        alert("Por favor, selecione um componente e informe o novo preço!");
+        return;
+    }
+
+    // Chama o Java enviando o novo preço
+    await fetch(`/api/formulas/atualizar/${id}?preco=${novoPreco}`, {
+        method: 'POST'
+    });
+
+    alert("Preço atualizado com sucesso no Banco de Dados! Observe a Implosão recalculando os custos.");
+    
+    // Recarrega tudo para mostrar a implosão visual
+    document.getElementById('novo-preco').value = '';
+    await carregarFormula(); 
+}
+
+// Quando carregar a árvore, atualiza também a caixa de seleção
+const funcaoOriginal = carregarFormula;
+carregarFormula = async function() {
+    await funcaoOriginal();
+    await carregarItensParaEdicao();
+};

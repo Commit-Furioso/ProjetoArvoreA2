@@ -1,42 +1,50 @@
 package com.projeto.arvore;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import java.util.Arrays;
+import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/formulas")
 public class ArvoreController {
 
-    // Rota 1: Devolve a árvore completa da Caneta (Explosão)
-    @GetMapping("/caneta")
-    public TreeNode getCaneta() {
-        List<ItemFormula> itensCaneta = Arrays.asList(
-            new ItemFormula("Caneta", null, 1, 0.00),
-            new ItemFormula("Tinta", "Caneta", 1, 0.00),
-            new ItemFormula("Pigmento", "Tinta", 1, 0.30),
-            new ItemFormula("Solvente", "Tinta", 1, 0.50),
-            new ItemFormula("Corpo", "Caneta", 1, 0.00),
-            new ItemFormula("Plástico", "Corpo", 1, 0.70),
-            new ItemFormula("Clip", "Corpo", 1, 0.30),
-            new ItemFormula("Tampa", "Caneta", 1, 0.00),
-            new ItemFormula("Plástico", "Tampa", 1, 0.50),
-            new ItemFormula("Vedação", "Tampa", 1, 0.20)
-        );
+    // Injeção do Banco de Dados
+    private final ItemFormulaRepository repository;
 
-        return buildTree(itensCaneta);
+    public ArvoreController(ItemFormulaRepository repository) {
+        this.repository = repository;
     }
 
-    // Rota 2: Devolve apenas o valor total calculado (Implosão)
+    // 1. Devolve a árvore completa buscando do BANCO DE DADOS
+    @GetMapping("/caneta")
+    public TreeNode getCaneta() {
+        List<ItemFormula> itens = repository.findAll();
+        return buildTree(itens);
+    }
+
+    // 2. Devolve apenas o valor total
     @GetMapping("/caneta/total")
     public double getTotalCaneta() {
         TreeNode raiz = getCaneta();
-        return calcularTotal(raiz);
+        return raiz != null ? calcularTotal(raiz) : 0;
     }
 
-    // --- MÉTODOS AUXILIARES (Lógica da Árvore) ---
+    // 3. Devolve a lista simples de itens (para o HTML montar o menu de edição)
+    @GetMapping("/itens")
+    public List<ItemFormula> getTodosItens() {
+        return repository.findAll();
+    }
+
+    // 4. ROTA CRUD: Atualiza o preço de um componente e salva no banco
+    @PostMapping("/atualizar/{id}")
+    public void atualizarPreco(@PathVariable Long id, @RequestParam double preco) {
+        ItemFormula item = repository.findById(id).orElse(null);
+        if (item != null) {
+            item.setPrecoUnitario(preco);
+            repository.save(item); // Grava a alteração no banco!
+        }
+    }
+
+    // --- MÉTODOS AUXILIARES ---
     private TreeNode buildTree(List<ItemFormula> itens) {
         ItemFormula itemRaiz = itens.stream()
                 .filter(i -> i.getNomePai() == null)
@@ -64,12 +72,10 @@ public class ArvoreController {
         if (node.getFilhos().isEmpty()) {
             return node.getItem().getPrecoUnitario() * node.getItem().getQuantidade();
         }
-        
         double somaCustoFilhos = 0;
         for (TreeNode filho : node.getFilhos()) {
             somaCustoFilhos += calcularTotal(filho);
         }
-        
         return somaCustoFilhos * node.getItem().getQuantidade();
     }
 }
