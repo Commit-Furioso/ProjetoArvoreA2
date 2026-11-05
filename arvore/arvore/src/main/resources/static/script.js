@@ -1,17 +1,28 @@
 let custoUnitario = 0;
 let arvoreGlobal = null;
+let produtoAtual = 'Caneta'; // Produto padrão inicial
 
-// 1. Busca os dados no Java (Spring Boot)
+// Troca o produto ativo quando o usuário clica num dos 3 botões
+async function selecionarProduto(nomeProduto) {
+    produtoAtual = nomeProduto;
+    document.getElementById('qtd-produzir').value = 1;
+    await carregarFormula();
+    mostrarNotificacao(`📦 Fórmula carregada: ${nomeProduto}`);
+}
+
+// 1. Busca os dados do produto atual no Java
 async function carregarFormula() {
     try {
-        const respostaArvore = await fetch('/api/formulas/caneta');
+        const nomeCodificado = encodeURIComponent(produtoAtual);
+
+        const respostaArvore = await fetch(`/api/formulas/produto/${nomeCodificado}`);
         arvoreGlobal = await respostaArvore.json();
 
-        const respostaTotal = await fetch('/api/formulas/caneta/total');
+        const respostaTotal = await fetch(`/api/formulas/produto/${nomeCodificado}/total`);
         custoUnitario = await respostaTotal.json();
 
         calcularProducao(); 
-        await carregarItensParaEdicao();
+        carregarItensParaEdicao();
         
     } catch (erro) {
         console.error("Erro de comunicação com o Java:", erro);
@@ -42,7 +53,7 @@ function desenharArvore(no, nivel, multiplicadorAcumulado) {
     let custoUnitarioDoNo = calcularCustoNo(no);
     let custoTotalNode = custoUnitarioDoNo * qtdTotalNode;
 
-    let precoFormatado = custoTotalNode.toFixed(2).replace('.', ',');
+    let precoFormatado = custoTotalNode.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     let html = `<div>${espacos} ${icone} <strong>${no.item.nome}</strong> (Qtd: ${qtdTotalNode} | Custo: R$ ${precoFormatado})</div>`;
 
@@ -62,50 +73,55 @@ function calcularProducao() {
     const qtdLote = parseInt(inputQtd) || 1; 
     
     const custoFinal = custoUnitario * qtdLote;
+    const valorFormatado = custoFinal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     
-    document.getElementById('resultado-total').innerText = 
-        `Valor Total: R$ ${custoFinal.toFixed(2).replace('.', ',')}`;
+    document.getElementById('resultado-total').innerText = `Valor Total: R$ ${valorFormatado}`;
 
     const container = document.getElementById('arvore-visual');
     container.innerHTML = desenharArvore(arvoreGlobal, 0, qtdLote);
 }
 
-// 5. Restaura a quantidade para 1 E os preços originais no Banco de Dados
+// 5. Restaura a quantidade para 1 E os preços originais de todos os produtos no Banco
 async function resetarProducao() {
     try {
-        // Pede ao Java para voltar os preços do banco ao padrão original
         await fetch('/api/formulas/resetar', {
             method: 'POST'
         });
 
-        // Volta o campo de quantidade para 1
         document.getElementById('qtd-produzir').value = 1;
-        
-        // Recarrega a árvore e os preços originais (R$ 2,50)
         await carregarFormula();
         
-        mostrarNotificacao("🔄 Quantidade e preços restaurados para o padrão (R$ 2,50)!");
+        mostrarNotificacao(`🔄 ${produtoAtual} restaurado para os valores padrão!`);
     } catch (erro) {
         console.error("Erro ao resetar:", erro);
         mostrarNotificacao("❌ Erro ao restaurar os valores padrão.", 'erro');
     }
 }
 
-// 6. Carrega os itens na caixa de seleção estilizada
-async function carregarItensParaEdicao() {
-    const resposta = await fetch('/api/formulas/itens');
-    const itens = await resposta.json();
-    
+// 6. Extrai apenas as matérias-primas (folhas) da árvore atual para o menu CRUD
+function extrairFolhas(no, listaFolhas = []) {
+    if (!no) return listaFolhas;
+    if (!no.filhos || no.filhos.length === 0) {
+        listaFolhas.push(no.item);
+    } else {
+        for (let filho of no.filhos) {
+            extrairFolhas(filho, listaFolhas);
+        }
+    }
+    return listaFolhas;
+}
+
+function carregarItensParaEdicao() {
     const select = document.getElementById('select-item');
     select.innerHTML = '<option value="">Selecione um componente...</option>';
     
-    const nomesDosPais = new Set(itens.map(item => item.nomePai));
+    if (!arvoreGlobal) return;
+
+    const folhas = extrairFolhas(arvoreGlobal);
     
-    itens.forEach(item => {
-        if (item.nomePai !== null && !nomesDosPais.has(item.nome)) {
-            let precoFormatado = item.precoUnitario.toFixed(2).replace('.', ',');
-            select.innerHTML += `<option value="${item.id}">${item.nome} (Atual: R$ ${precoFormatado})</option>`;
-        }
+    folhas.forEach(item => {
+        let precoFormatado = item.precoUnitario.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        select.innerHTML += `<option value="${item.id}">${item.nome} - ${item.nomePai} (Atual: R$ ${precoFormatado})</option>`;
     });
 }
 
@@ -134,7 +150,7 @@ async function atualizarPrecoComponente() {
     }
 }
 
-// 8. Função para exibir a notificação elegante
+// 8. Exibe a notificação Toast
 function mostrarNotificacao(mensagem, tipo = 'sucesso') {
     const toast = document.getElementById('toast-notificacao');
     toast.innerText = mensagem;
