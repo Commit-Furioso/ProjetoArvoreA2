@@ -44,6 +44,23 @@ public class ArvoreController {
         }
     }
 
+    // 5. ROTA RESET: Restaura os preços primários originais no Banco de Dados
+    @PostMapping("/resetar")
+    public void resetarValoresPadrao() {
+        repository.deleteAll();
+        repository.saveAll(java.util.Arrays.asList(
+            new ItemFormula("Caneta", null, 1, 0.00),
+            new ItemFormula("Tinta", "Caneta", 1, 0.00),
+            new ItemFormula("Pigmento", "Tinta", 1, 0.30),
+            new ItemFormula("Solvente", "Tinta", 1, 0.50),
+            new ItemFormula("Corpo", "Caneta", 1, 0.00),
+            new ItemFormula("Plástico", "Corpo", 1, 0.70),
+            new ItemFormula("Clip", "Corpo", 1, 0.30),
+            new ItemFormula("Tampa", "Caneta", 1, 0.00),
+            new ItemFormula("Plástico", "Tampa", 1, 0.50),
+            new ItemFormula("Vedação", "Tampa", 1, 0.20)
+        ));
+    }
     // --- MÉTODOS AUXILIARES ---
     private TreeNode buildTree(List<ItemFormula> itens) {
         ItemFormula itemRaiz = itens.stream()

@@ -22,14 +22,16 @@
             </div>
         </div>
 
-        <div class="calculadora">
-            <h3>Simulação de Lote</h3>
-            <label for="qtd-produzir">Quantidade de produtos a fabricar:</label>
-            <input type="number" id="qtd-produzir" value="1" min="1" onchange="calcularProducao()">
-            <button class="btn-secundario" onclick="calcularProducao()">Recalcular</button>
-            
-            <h2 id="resultado-total">Valor Total: R$ 0,00</h2>
-        </div>
+<div class="calculadora">
+    <h3 style="color: #d32f2f;">Simulação de Lote</h3>
+    <label for="qtd-produzir">Quantidade de produtos a fabricar:</label>
+    <input type="number" id="qtd-produzir" class="input-estilizado" value="1" min="1" onchange="calcularProducao()" style="width: 100px; margin-right: 10px;">
+    
+    <!-- Novo botão que chama a função de reset -->
+    <button class="btn-secundario" onclick="resetarProducao()">Voltar ao Padrão</button>
+    
+    <h2 id="resultado-total">Valor Total: R$ 0,00</h2>
+</div>
 <div class="calculadora">
             <h3>✏️ Atualizar Preço (CRUD)</h3>
             
@@ -51,7 +53,7 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="script.js?v=2"></script>
 </body>
 <!-- Elemento da Notificação Toast -->
     <div id="toast-notificacao" class="toast">
